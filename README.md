@@ -4,7 +4,6 @@ Multiplayer FoundryVTT hosted with AWS ECS Fargate, and utilizing AWS Lambda for
 This is not at the point where it is an easy setup. Technical knowledge will be required to set it up and maintain it. While this utilizes AWS Fargate to minimize costs, you are altimetry responsible for managing cost of your AWS resources and properly deprovisioning AWS resources when no longer in use. It is also your responsibility to ensure data and endpoint security.
 
 # Architecture
-![Architectural Diagram](./architectural-diagram.png)
 
 # Requirements
 - AWS Knowledge
