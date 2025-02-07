@@ -98,13 +98,25 @@ Resources:
               Value: !Ref FoundryVersion
             - Name: FOUNDRY_HOSTNAME
               Value: !Ref Domain
-            - Name: FOUNDRY_AWS_CONFIG
-              Value: true
             - Name: FOUNDRY_ADMIN_KEY
               Value: !Ref FoundryAdminPassword
           MountPoints:
             - SourceVolume: efs-volume
               ContainerPath: /data
+        - Name: !Sub '${AWS::StackName}-sftp'
+          Image: docker.io/atmoz/sftp:latest
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: sftp
+          Environment:
+            - Name: SFTP_USERS
+              Value: !Sub 'admin:${FoundryAdminPassword}:::data'
+          MountPoints:
+            - SourceVolume: efs-volume
+              ContainerPath: /home/admin/data
       Volumes:
         - Name: efs-volume
           EFSVolumeConfiguration:
@@ -178,6 +190,11 @@ Resources:
           FromPort: 30000
           CidrIp: 0.0.0.0/0
           Description: FoundryVTT Client Port
+        - IpProtocol: TCP
+          ToPort: 22
+          FromPort: 22
+          CidrIp: 0.0.0.0/0
+          Description: FoundryVTT SFTP Port
   ContainerSecurityGroupEFSIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
