@@ -60,10 +60,7 @@ def stop_server():
 def is_server_running():
   try:
     task_arn = client.list_tasks(cluster=cluster).get('taskArns')[0]
-    response = client.describe_tasks(
-        cluster=cluster,
-        tasks=[task_arn],
-    )
+    response = client.describe_tasks(cluster=cluster,tasks=[task_arn])
     return response['tasks'][0]['containers'][0]['lastStatus'] == 'RUNNING'
   except Exception:
     return False

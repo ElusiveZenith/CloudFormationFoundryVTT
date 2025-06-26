@@ -65,6 +65,7 @@ def stop_server():
   except Exception as e:
     post_discord_message("Unable to stop server. Failed to set desired count.", admin_ping=True)
     raise e
+  # TODO: Deregister IP
   cron_job_state(False)
   post_discord_message("Server Stopped", notification_ping=False)
   return 200, "Server Stop Initiated"
