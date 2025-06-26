@@ -45,3 +45,4 @@ Besides building and hosting the container registry, you will need to develop a 
 
 # Disclaimer and Indemnification
 By using the code, templates, or any other content provided in this repo ("Repo"), you ("User") agree to indemnify and hold harmless the repo owner and any contributors from any claims, damages, or expenses arising from the User's use or misuse of this Repo.
+
