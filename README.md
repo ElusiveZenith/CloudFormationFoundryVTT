@@ -1,11 +1,13 @@
 # Intro
 Multiplayer FoundryVTT hosted with AWS ECS Fargate, and utilizing AWS Lambda for managing the server. 
 
+This is not at the point where it is an easy setup. Technical knowledge will be required to set it up and maintain it. While this utilizes AWS Fargate to minimize costs, you are altimetry responsible for managing cost of your AWS resources and properly deprovisioning AWS resources when no longer in use. It is also your responsibility to ensure data and endpoint security.
+
 ## Used Docker Images
 [felddy/foundryvtt-docker](https://github.com/felddy/foundryvtt-docker)
+
 [atmoz/sftp](https://github.com/atmoz/sftp)
 
-This is not at the point where it is an easy setup. Technical knowledge will be required to set it up and maintain it. While this utilizes AWS Fargate to minimize costs, you are altimetry responsible for managing cost of your AWS resources and properly deprovisioning AWS resources when no longer in use. It is also your responsibility to ensure data and endpoint security.
 
 # Requirements
 - Docker Knowledge
@@ -31,8 +33,11 @@ Connect from your browser by going to your domain, prepended with port 30000. Ex
 - Server will automatically shut down after a short while of no connections to port 30000
 
 ## SFTP
-A SFTP server is run alongside FoundryVTT for easy access to files. With your FTP application of choice, connect to same domain using the user `admin`. 
-The password is the same admin password that you set as the FoundryAdminPassword in the stack formation
+An SFTP server is run alongside FoundryVTT for easy access to files. With your FTP application of choice, connect to same domain using the user `admin`.
+
+The password is the same admin password that you set as the `FoundryAdminPassword` in the stack formation
+
+**!Note: Open a second connection through the browser to port 30000 to prevent the server from automatically shutting down.**
 
 # Some Screws Not Included
 Besides building and hosting the container registry, you will need to develop a way for your players to access the endpoint to launch the server. There is a IAM User created which has that permission to invoke the API, but it is pest to not give users direct AWS access. Personally, I created a Discord bot that exposed slash commands which used the IAM User to make the API calls.
