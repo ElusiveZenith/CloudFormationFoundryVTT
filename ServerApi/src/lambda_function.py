@@ -1,48 +1,6 @@
-import os
-import boto3
-import requests
-
-client = boto3.client('ecs')
-scheduler_client = boto3.client('scheduler')
-
-discord_webhook_url = os.environ.get('DISCORD_WEBHOOK_URL') or None
-discord_comment_username = os.environ.get('DISCORD_WEBHOOK_USERNAME') or 'FoundryVTT Server'
-discord_error_admin_id = os.environ.get('DISCORD_ERROR_ADMIN_ID') or None
-discord_notification_role_id = os.environ.get('DISCORD_NOTIFICATION_ROLE_ID') or None
-
-
-def post_discord_message(message, notification_ping=False, admin_ping=False):
-  if discord_webhook_url is None:
-    return
-  if notification_ping and discord_notification_role_id:
-    message = f'<{discord_notification_role_id}> {message}'
-  if admin_ping and discord_error_admin_id:
-    message = f'<{discord_error_admin_id}> {message}'
-  data = {
-      "content": message,
-      "username": discord_comment_username
-  }
-  requests.post(discord_webhook_url, json=data)
-
-
-def update_service_desired_count(desired_count):
-  client.update_service(
-    cluster=os.environ.get('CLUSTER') or 'FoundryVTT-ServerCluster',
-    service=os.environ.get('SERVICE') or 'FoundryVTT',
-    desiredCount=desired_count
-  )
-
-
-def cron_job_state(enabled):
-  response = scheduler_client.get_schedule(
-      Name='FoundryVTT-Server-Monitor-Schedule'
-  )
-  response['State'] = "ENABLED" if enabled else "DISABLED"
-  response.pop('Arn', None)
-  response.pop('CreationDate', None)
-  response.pop('LastModificationDate', None)
-  response.pop('ResponseMetadata', None)
-  scheduler_client.update_schedule(**response)
+from server import cron_job_state, update_service_desired_count
+from discord import post_discord_message
+from dns import deregister_ip
 
 
 def start_server():
@@ -65,10 +23,15 @@ def stop_server():
   except Exception as e:
     post_discord_message("Unable to stop server. Failed to set desired count.", admin_ping=True)
     raise e
-  # TODO: Deregister IP
-  cron_job_state(False)
+  deregister_ip()
+  try:
+    cron_job_state(False)
+  except Exception as e:
+    post_discord_message("Failed to stop server manager.", admin_ping=True)
+    print("Failed to stop server manager", e)
   post_discord_message("Server Stopped", notification_ping=False)
   return 200, "Server Stop Initiated"
+
 
 def routing(path):
   match path:
