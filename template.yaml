@@ -488,6 +488,7 @@ Resources:
           - Effect: Allow
             Action:
             - ecs:UpdateService 
+            - ecs:UntagResource
             Resource:
             - !Sub 'arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:service/${ServerCluster}/${AWS::StackName}'
   ApiLambda:
